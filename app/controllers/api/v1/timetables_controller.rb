@@ -1,50 +1,42 @@
-class Api::V1::ProjectsController < ApplicationController
+class Api::V1::TimetablesController < ApplicationController
   def index
-    project1 = Project.where(owner_id: params[:id])
-    project2 = Project.joins(:tasks).where(tasks: {user_id: params[:id]})
-    @projects = (project1 + project2).uniq
-    render :json => @projects, include: ['owner', 'tasks', 'tasks.user']
+    @user = User.find(params[:user_id])
+    render :json => @user.timetables
+    # render :json => @timetables, include: ['owner', 'tasks', 'tasks.user']
   end
   
   def create
-    @project = Project.create(project_params)
-    if @project
-      task_params.each{|task| @project.tasks.create(task)}
-      render :json => @project
+    @timetable = Timetable.find_or_create_by(name: timetable_params)
+    if @timetable
+      render :json => @timetable
     else
-      render :json => {'error': @project.errors.full_messages}
+      render :json => {'error': @timetable.errors.full_messages}
     end
   end
   
   def update
-    @project = Project.find(params["id"])
-    if @project.update_attributes(project_params)
-      @project.tasks.destroy_all
-      task_params.each{|task| @project.tasks.create(task)}
-      render :json => @project
+    @timetable = Timetable.find(params["id"])
+    if @timetable.update_attributes(timetable_params)
+      render :json => @timetable
     else
-      render :json => {'error': @project.errors.full_messages} 
+      render :json => {'error': @timetable.errors.full_messages} 
     end
   end
   
   def show
-    render :json => Project.find(params[:id]), include: ['owner', 'tasks', 'tasks.user']
+    render :json => Timetable.find(params[:id])
   end
   
   def destroy
-    @project = Project.find(params[:id])
-    @project.destroy
-    render :json => @project
+    @timetable = Timetable.find(params[:id])
+    @timetable.destroy
+    render :json => @timetable
   end
   
   private
   
-  def project_params
-    params.permit(:title, :description, :start_date, :end_date, :owner_id)
-  end
-
-  def task_params
-    params.permit(tasks: [:content, :user_id]).to_h['tasks']
+  def timetable_params
+    params.permit(:name)
   end
 
 end
