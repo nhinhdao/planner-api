@@ -5,8 +5,11 @@ class Api::V1::PlacesController < ApplicationController
   end
   
   def create
-    @place = Place.create(place_params)
-    if @place
+    # binding.pry
+    @place = Place.find_or_create_by(code: params[:place][:code])
+    @place.update_attributes(place_params_create)
+    if @place.valid?
+      review_params.each{|review| @place.reviews.create(review)}
       render :json => @place
     else
       render :json => {'error': @place.errors.full_messages}
@@ -15,7 +18,7 @@ class Api::V1::PlacesController < ApplicationController
   
   def update
     @place = Place.find(params["id"])
-    if @place.update_attributes(place_params)
+    if @place.update_attributes(place_params_update)
       render :json => @place
     else
       render :json => {'error': @place.errors.full_messages} 
@@ -35,8 +38,16 @@ class Api::V1::PlacesController < ApplicationController
   end
   
   private
+
+  def place_params_create
+    params.require(:place).permit(:name, :category, :contact, :location, :rating, :user_id, :isAddedToList, photos: [])
+  end
   
-  def place_params
+  def place_params_update
     params.require(:place).permit(:time, :timetable_id)
+  end
+
+  def review_params
+    params.permit(reviews: [:user_name, :user_image, :text, :time_created, :rating]).to_h['reviews']
   end
 end

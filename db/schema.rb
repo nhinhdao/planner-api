@@ -17,12 +17,14 @@ ActiveRecord::Schema.define(version: 2019_04_01_201447) do
 
   create_table "places", force: :cascade do |t|
     t.string "name"
+    t.string "code"
     t.string "category"
     t.string "contact"
     t.string "location"
     t.integer "rating"
     t.datetime "time"
     t.string "photos", default: [], array: true
+    t.boolean "isAddedToList"
     t.integer "user_id"
     t.integer "timetable_id"
     t.datetime "created_at", null: false
