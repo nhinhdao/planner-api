@@ -6,7 +6,8 @@ class Api::V1::TimetablesController < ApplicationController
   end
   
   def create
-    @timetable = Timetable.find_or_create_by(name: timetable_params)
+    @timetable = Timetable.find_or_create_by(name: params[:timetable][:name])
+    binding.pry
     if @timetable
       render :json => @timetable
     else
