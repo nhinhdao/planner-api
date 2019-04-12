@@ -6,9 +6,9 @@ class Api::V1::TimetablesController < ApplicationController
   end
   
   def create
-    @timetable = Timetable.find_or_create_by(name: params[:timetable][:name])
-    binding.pry
-    if @timetable
+    @timetable = Timetable.find_or_create_by(name: params[:timetable][:name], user_id: params[:timetable][:user_id])
+    # binding.pry
+    if @timetable.valid?
       render :json => @timetable
     else
       render :json => {'error': @timetable.errors.full_messages}
@@ -37,7 +37,7 @@ class Api::V1::TimetablesController < ApplicationController
   private
   
   def timetable_params
-    params.permit(:name)
+    params.permit(:name, :user_id)
   end
 
 end

@@ -18,6 +18,7 @@ class Api::V1::PlacesController < ApplicationController
   
   def update
     @place = Place.find(params["id"])
+    # binding.pry
     if @place.update_attributes(place_params_update)
       render :json => @place
     else
@@ -34,13 +35,15 @@ class Api::V1::PlacesController < ApplicationController
   end
   
   def destroy
-    Place.destroy(params[:id])
+    @place = Place.find(params[:id])
+    @place.destroy
+    render :json => @place
   end
   
   private
 
   def place_params_create
-    params.require(:place).permit(:name, :category, :contact, :location, :rating, :user_id, :isAddedToList, photos: [])
+    params.require(:place).permit(:name, :category, :contact, :location, :rating, :user_id, :timetable_id, :time, :isAddedToList, photos: [])
   end
   
   def place_params_update
